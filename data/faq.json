@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "question": "Nikah islemleri icin ne yapmaliyim?",
+    "answer": "Nikah islemleri icin saglik raporu, 4 adet vesikalik fotograf, nufus cuzdanlari, ciftlerin birlikte muracaati ve gerekli durumlarda anne baba muvaffakatnamesi gereklidir.",
+    "intent": "nikah"
+  },
+  {
+    "id": 2,
+    "question": "Belediyemizde cenaze islemleri nasil yapilir?",
+    "answer": "Cenaze bildirimi 225 18 56 veya Alo 188 numaralari aranarak yapilir. Cenaze araci talep edilen yerden cenazeyi alir. Defin islemleri Terzibaba Mezarligi Mezarliklar Mudurlugu tarafindan gerceklestirilir.",
+    "intent": "cenaze"
+  },
+  {
+    "id": 3,
+    "question": "Belediyemizin mobil uygulama destegi var mi?",
+    "answer": "Erzincan Belediyesi'nin iPhone ve Android cihazlar icin mobil uygulamalari bulunmaktadir. Uygulamalar sanal magazalardan indirilebilir.",
+    "intent": "mobil_uygulama"
+  },
+  {
+    "id": 4,
+    "question": "Internet uzerinden vergi borcu nasil odenir?",
+    "answer": "Vergi borclari belediyenin web sitesindeki E-Belediye sistemi uzerinden online olarak odenebilir.",
+    "intent": "ebelediye"
+  }
+]

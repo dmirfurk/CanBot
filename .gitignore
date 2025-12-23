@@ -1,0 +1,9 @@
+# Visual Studio
+.vs/
+
+# Python
+__pycache__/
+*.pyc
+
+# Database
+db/chatbot.db
