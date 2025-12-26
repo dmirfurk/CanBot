@@ -1,9 +1,16 @@
 ﻿from fastapi import FastAPI
 from pydantic import BaseModel
 from nlp.router import route_question
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Erzincan Belediyesi Akilli Chatbot API"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 class ChatRequest(BaseModel):

@@ -1,23 +1,167 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Erzincan Belediyesi Chatbot</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 420px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #005baa;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .user {
+            text-align: right;
+        }
+
+            .user span {
+                background: #005baa;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 15px 15px 0 15px;
+                display: inline-block;
+                max-width: 80%;
+            }
+
+        .bot span {
+            background: #e5e7eb;
+            padding: 8px 12px;
+            border-radius: 15px 15px 15px 0;
+            display: inline-block;
+            max-width: 80%;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+            .chat-input input {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                outline: none;
+                font-size: 14px;
+            }
+
+            .chat-input button {
+                background: #005baa;
+                color: white;
+                border: none;
+                padding: 0 20px;
+                cursor: pointer;
+            }
+
+                .chat-input button:hover {
+                    background: #004a8c;
+                }
+
+        a {
+            color: #005baa;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
-    <div id="chat-container">
-        <div id="chat-header">Erzincan Belediyesi Chatbot</div>
+    <div class="chat-container">
+        <div class="chat-header">
+            Erzincan Belediyesi Akıllı Chatbot
+        </div>
 
-        <div id="chat-messages"></div>
+        <div class="chat-messages" id="messages"></div>
 
-        <div id="chat-input">
-            <input type="text" id="user-input" placeholder="Sorunuzu yazin..." />
-            <button onclick="sendMessage()">Gonder</button>
+        <div class="chat-input">
+            <input type="text" id="question" placeholder="Sorunuzu yazın..." />
+            <button onclick="sendMessage()">Gönder</button>
         </div>
     </div>
 
-    <script src="widget.js"></script>
+    <script>
+        const API_URL = "http://127.0.0.1:8000/chat";
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById("messages");
+            const div = document.createElement("div");
+            div.className = "message " + sender;
+
+            const span = document.createElement("span");
+            span.innerHTML = text;
+
+            div.appendChild(span);
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("question");
+            const question = input.value.trim();
+            if (!question) return;
+
+            addMessage(question, "user");
+            input.value = "";
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await res.json();
+
+                let reply = `<b>${data.answer}</b>`;
+
+                if (data.url) {
+                    reply += `<br><a href="${data.url}" target="_blank">${data.title}</a>`;
+                }
+
+                addMessage(reply, "bot");
+
+            } catch (err) {
+                addMessage("Sunucuya bağlanılamadı.", "bot");
+            }
+        }
+
+        // Enter ile gönderme
+        document.getElementById("question").addEventListener("keydown", e => {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+
 </body>
 </html>
