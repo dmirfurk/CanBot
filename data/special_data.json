@@ -1,0 +1,23 @@
+﻿[
+  {
+    "keywords": ["başkan", "baskan", "kimdir", "bekir", "aksun", "özgeçmiş", "biyografi"],
+    "title": "Erzincan Belediye Başkanı: Bekir Aksun",
+    "answer": "<b>Bekir Aksun Kimdir?</b><br>1967 yılında Erzincan’da doğdu. İlk, orta ve lise öğrenimini Erzincan’da, Yüksek öğrenimini ise Erzurum Atatürk Üniversitesi İşletme Fakültesinde tamamladı. 1988-2006 yılları arasında Milli Eğitim Bakanlığında öğretmenlik ve idarecilik yaptı. 31 Mart 2019 Mahalli İdareler seçimlerinde Erzincan Belediye Başkanı olarak seçilmiştir. Evli ve 3 çocuk babasıdır.",
+    "url": "https://www.erzincan.bel.tr/",
+    "score_boost": 100
+  },
+  {
+    "keywords": ["adres", "konum", "nerede", "lokasyon", "yeriniz", "harita"],
+    "title": "Erzincan Belediyesi Adres Bilgisi",
+    "answer": "<b>Adresimiz:</b><br>Erzincan Belediyesi Hizmet Binası<br>Cumhuriyet Mahallesi, Halit Paşa Caddesi, No:1<br>Merkez / ERZİNCAN",
+    "url": "https://www.erzincan.bel.tr/iletisim",
+    "score_boost": 90
+  },
+  {
+    "keywords": ["telefon", "tel", "no", "numara", "çağrı", "ulaşım", "iletişim"],
+    "title": "İletişim Numaraları",
+    "answer": "<b>Çağrı Merkezi:</b> 444 9 024<br><b>Santral:</b> 0446 214 10 03<br><b>Whatsapp Hattı:</b> 0535 666 00 24",
+    "url": "https://www.erzincan.bel.tr/iletisim",
+    "score_boost": 90
+  }
+]

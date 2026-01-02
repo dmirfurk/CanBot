@@ -1,52 +1,367 @@
+﻿/* Font ve Genel Ayarlar */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif; /* Daha modern bir font */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    background-color: #f0f2f5;
+}
+
+/* --- BOT BUTONU (SÜPER TASARIM) --- */
+.chat-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #005baa, #0082c8); /* Gradient Renk */
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 91, 170, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s;
+    z-index: 9999;
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
+    justify-content: center;
+    /* Zıplama Animasyonu */
+    animation: bounce-idle 3s infinite ease-in-out;
 }
 
+    /* Üzerine gelince animasyon dursun ve büyüsün */
+    .chat-toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 30px rgba(0, 91, 170, 0.6);
+        animation: none;
+    }
+
+    /* İkonların Boyutu */
+    .chat-toggle-btn svg {
+        width: 35px;
+        height: 35px;
+        transition: opacity 0.3s;
+    }
+
+/* Bildirim Noktası (Kırmızı Yuvarlak) */
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff3b30;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    animation: pulse 2s infinite;
+}
+
+/* --- KONUŞMA BALONU (TOOLTIP) --- */
+.bot-tooltip {
+    position: fixed;
+    bottom: 110px;
+    right: 40px;
+    background: white;
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 20px 20px 0 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 9997;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: tooltip-fade 6s infinite; /* 6 saniyede bir görünür */
+    pointer-events: none;
+}
+
+/* --- ANİMASYONLAR --- */
+
+/* Botun Zıplaması */
+@keyframes bounce-idle {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+    55% {
+        transform: rotate(5deg);
+    }
+
+    60% {
+        transform: rotate(-5deg);
+    }
+
+    65% {
+        transform: rotate(0);
+    }
+}
+
+/* Kırmızı Noktanın Yanıp Sönmesi */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Konuşma Balonunun Görünüp Kaybolması */
+@keyframes tooltip-fade {
+    0%, 80% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    85% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Görün */
+    95% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Bekle */
+    100% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    /* Kaybol */
+}
+
+/* --- SOHBET PENCERESİ (YENİLENMİŞ) --- */
 .chat-container {
-    width: 400px;
-    background: #fff;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: fixed;
+    bottom: 105px;
+    right: 30px;
+    width: 380px;
+    height: 550px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9998;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-#chat-box {
-    height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
+    .chat-container.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
+
+/* Header */
+.chat-header {
+    background: #005baa;
+    padding: 18px 25px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-header h3 {
+    font-size: 16px;
+    margin: 0;
+}
+
+.chat-header p {
+    font-size: 12px;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.header-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: 0.2s;
+}
+
+    .header-close:hover {
+        opacity: 1;
+        transform: rotate(90deg);
+    }
+
+/* Mesajlar */
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f4f7f9;
+}
+
+    /* Scrollbar Tasarımı */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
 
 .message {
-    margin-bottom: 8px;
+    margin-bottom: 15px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: 0;
+    }
 }
 
 .user {
     text-align: right;
-    color: blue;
 }
 
 .bot {
     text-align: left;
-    color: green;
 }
 
-.input-area {
+.user span {
+    background: #005baa;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 20px 20px 4px 20px;
+    display: inline-block;
+    max-width: 80%;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,91,170,0.15);
+}
+
+.bot span {
+    background: white;
+    color: #333;
+    padding: 12px 18px;
+    border-radius: 20px 20px 20px 4px;
+    display: inline-block;
+    max-width: 85%;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+}
+
+/* Linkler */
+.bot-link {
+    display: block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: #eef7ff;
+    color: #005baa;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+
+    .bot-link:hover {
+        background: white;
+        border-color: #005baa;
+    }
+
+/* Input */
+.chat-input {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eaeaea;
     display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-input {
-    flex: 1;
-    padding: 8px;
-}
+    .chat-input input {
+        flex: 1;
+        padding: 12px 20px;
+        border: 1px solid #eee;
+        border-radius: 25px;
+        background: #f9f9f9;
+        outline: none;
+        transition: 0.3s;
+    }
 
-button {
-    padding: 8px 12px;
-    cursor: pointer;
+        .chat-input input:focus {
+            background: white;
+            border-color: #005baa;
+        }
+
+    .chat-input button {
+        background: #005baa;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        box-shadow: 0 3px 10px rgba(0,91,170,0.2);
+    }
+
+        .chat-input button:hover {
+            transform: scale(1.1);
+            background: #004a8c;
+        }
+
+/* Mobil Uyumluluk */
+@media (max-width: 480px) {
+    .chat-container {
+        width: 90%;
+        height: 80%;
+        bottom: 100px;
+        right: 5%;
+    }
 }
