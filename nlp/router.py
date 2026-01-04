@@ -1,18 +1,13 @@
 ﻿import json
 import os
 from nlp.text_utils import extract_keywords, turkish_lower
-
-# TheFuzz kütüphanesi
-try:
-    from thefuzz import fuzz
-except ImportError:
-    fuzz = None
+from thefuzz import fuzz  # Artık zorunlu, try-except yok.
 
 DATA_PATH = "data/site_pages.json"
 FAQ_PATH = "data/faq.json"
 SPECIAL_PATH = "data/special_data.json"
 
-# Verileri Yükle (Encoding hatası olmasın diye utf-8-sig kullanıyoruz)
+# Verileri Yükle
 SITE_PAGES = []
 FAQ_DATA = []
 SPECIAL_DATA = []
@@ -29,12 +24,10 @@ if os.path.exists(SPECIAL_PATH):
     with open(SPECIAL_PATH, encoding="utf-8-sig") as f:
         SPECIAL_DATA = json.load(f)
 
-# --- YENİ EKLENEN SOHBET FONKSİYONU ---
+# --- SOHBET FONKSİYONU ---
 def check_chit_chat(question):
-    """Kullanıcının selam, hal hatır, kimlik ve durum bildiren mesajlarını yanıtlar."""
     q = turkish_lower(question)
     
-    # 1. Kimlik Soruları (Sen kimsin?)
     identity_keywords = ["sen kimsin", "kimsin", "adin ne", "adın ne", "ismin ne", "bot musun"]
     if any(x in q for x in identity_keywords):
         return {
@@ -42,7 +35,6 @@ def check_chit_chat(question):
             "items": []
         }
 
-    # 2. Durum Soruları (Bot'a sorulan: Naber, Nasılsın?)
     status_keywords = ["nasılsın", "nasilsin", "naber", "ne haber", "ne var ne yok", "nasıl gidiyor"]
     if any(x in q for x in status_keywords):
         return {
@@ -50,8 +42,6 @@ def check_chit_chat(question):
             "items": []
         }
 
-    # --- YENİ EKLENEN KISIM: KULLANICI CEVABI (İyiyim) ---
-    # Kullanıcı "İyiyim", "Süperim" vb. derse
     user_status_good = ["iyiyim", "çok iyiyim", "süperim", "harikayım", "bomba gibiyim", "fena değilim", "idare eder", "çok şükür"]
     if any(x in q for x in user_status_good):
         return {
@@ -65,9 +55,7 @@ def check_chit_chat(question):
             "answer": "Bunu duyduğuma üzüldüm. 😔 Geçmiş olsun. Umarım size yardımcı olarak modunuzu biraz olsun düzeltebilirim. Bir isteğiniz var mı?",
             "items": []
         }
-    # -----------------------------------------------------
 
-    # 3. Selamlaşma (Genel)
     greeting_keywords = ["selam", "merhaba", "slm", "sa ", "sa.", "günaydın", "iyi akşamlar", "iyi geceler", "iyi günler"]
     if q == "sa" or any(x in q for x in greeting_keywords):
         return {
@@ -75,7 +63,6 @@ def check_chit_chat(question):
             "items": []
         }
 
-    # 4. Teşekkür ve Veda
     farewell_keywords = ["teşekkür", "sağol", "sagol", "görüşürüz", "baybay", "hoşçakal", "kolay gelsin", "tamamdır"]
     if any(x in q for x in farewell_keywords):
         return {
@@ -84,7 +71,6 @@ def check_chit_chat(question):
         }
 
     return None
-# --------------------------------------
 
 # Özel Veri Kontrolü
 def check_special_data(question_keywords):
@@ -99,10 +85,10 @@ def check_special_data(question_keywords):
         for k in item_keywords:
             if k in q_text: score += 30
         
-        if fuzz:
-            for k in item_keywords:
-                for qk in question_keywords:
-                    if fuzz.ratio(k, qk) > 85: score += 20
+        # Fuzz artık kesin var
+        for k in item_keywords:
+            for qk in question_keywords:
+                if fuzz.ratio(k, qk) > 85: score += 20
         
         if score > 40 and score > max_score:
             max_score = score
@@ -112,16 +98,14 @@ def check_special_data(question_keywords):
         return {"answer": best_item["answer"], "items": [{"title": best_item["title"], "url": best_item["url"], "snippet": "Özel Bilgi"}]}
     return None
 
-
 def route_question(question: str):
-    # 1. SOHBET (CHIT-CHAT) KONTROLÜ (YENİ)
-    # Eski selamlaşma kodunu sildik, yerine bunu koyduk.
+    # 1. Sohbet Kontrolü
     chit_chat_result = check_chit_chat(question)
     if chit_chat_result:
         return chit_chat_result
 
-    # Keywordleri çıkar
     q_keywords = extract_keywords(question)
+    q_str = " ".join(q_keywords) # Başlık kontrolü için birleştirilmiş hali
 
     # 2. Özel Veri Kontrolü
     special_result = check_special_data(q_keywords)
@@ -129,7 +113,7 @@ def route_question(question: str):
         return special_result
 
     # 3. FAQ Kontrolü
-    if fuzz and FAQ_DATA:
+    if FAQ_DATA:
         q_lower = turkish_lower(question)
         best_match = None
         best_ratio = 0
@@ -151,25 +135,40 @@ def route_question(question: str):
 
     for page in SITE_PAGES:
         score = 0
+        page_title = page.get("title", "")
         page_keywords = page.get("keywords", [])
         url_slug = page["url"].split("/")[-1].replace("-", " ")
-        url_slug = turkish_lower(url_slug)
+        
+        # Normalizasyon
+        norm_title = turkish_lower(page_title)
+        norm_url = turkish_lower(url_slug)
 
+        # --- YENİ EKLENEN KRİTİK BÖLÜM: BAŞLIK KONTROLÜ ---
+        # 1. Kullanıcının sorusu direkt başlıkta geçiyor mu? (Örn: "Yazı işleri" -> "Yazı İşleri Müdürlüğü")
+        if q_str in norm_title or norm_title in q_str:
+            score += 50
+        
+        # 2. Fuzzy Match ile Başlık Benzerliği (Yazım hataları için)
+        title_ratio = fuzz.token_set_ratio(q_str, norm_title)
+        if title_ratio > 80:
+            score += 30
+        
+        # 3. URL Kontrolü (URL'de geçiyorsa da yüksek puan)
         for qk in q_keywords:
-            if qk in url_slug: score += 10
+            if qk in norm_url: 
+                score += 20
+            
+            # 4. Keyword Kontrolü
             for pk in page_keywords:
                 pk = turkish_lower(pk)
-                if fuzz:
-                    if fuzz.ratio(qk, pk) > 85: score += 5
-                    elif fuzz.ratio(qk, pk) > 60: score += 2
-                else:
-                    if qk == pk: score += 5
-                    elif qk in pk or pk in qk: score += 2
+                if fuzz.ratio(qk, pk) > 85: score += 5
+                elif fuzz.ratio(qk, pk) > 60: score += 2
 
-        q_str = " ".join(q_keywords)
+        # Bonus Puanlar (Önemli Sayfalar)
         if "iletisim" in q_str and "iletisim" in page["url"]: score += 15
         if "duyuru" in q_str and "duyuru" in page["url"]: score += 15
         if "baskan" in q_str and "baskan" in page["url"]: score += 15
+        if "mudurluk" in q_str and "mudurluk" in page["url"]: score += 15
 
         if score > best_score:
             best_score = score
@@ -178,7 +177,7 @@ def route_question(question: str):
     if best_page and best_score >= MIN_SCORE_THRESHOLD:
         return {
             "answer": "Web sitemizde konuyla ilgili şu sayfayı buldum:",
-            "items": [{"title": best_page["title"], "url": best_page["url"], "snippet": f"Puan: {best_score}"}]
+            "items": [{"title": best_page["title"], "url": best_page["url"], "snippet": f"Uygunluk: %{min(best_score, 100)}"}]
         }
 
     return {"answer": "Maalesef bu konuda bir bilgim yok veya ne demek istediğinizi anlayamadım. 😔", "items": []}

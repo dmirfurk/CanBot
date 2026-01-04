@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class ChatRequest(BaseModel):
+class ChatRequest(BaseModel):   
     question: str
 
 class ChatResponse(BaseModel):

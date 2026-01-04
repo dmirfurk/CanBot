@@ -56,20 +56,32 @@ async function sendMessage() {
     addMessage(text, "user");
     questionInput.value = "";
 
-    // Yükleniyor efekti (Opsiyonel ama şık durur)
+    // --- YENİ: Düşünüyor Animasyonu (Üç Nokta) ---
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "message bot";
-    loadingDiv.innerHTML = "<span>...</span>";
     loadingDiv.id = "loading-msg";
+    // Baloncuğun içine animasyon yapısını koyuyoruz
+    loadingDiv.innerHTML = `
+        <span>
+            <div class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </span>`;
     messagesDiv.appendChild(loadingDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: text })
-        });
+        // --- ÖNEMLİ KISIM: Bekleme Mantığı ---
+        // Promise.all şunu yapar: Hem API isteğini atar hem de bekleme süresini başlatır.
+        // İkisi de bitmeden aşağıdaki satıra geçmez.
+        const [res] = await Promise.all([
+            fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: text })
+            }),
+            new Promise(resolve => setTimeout(resolve, 1500)) // 1500ms (1.5 saniye) bekle
+        ]);
 
         if (!res.ok) throw new Error("API Hatası");
 

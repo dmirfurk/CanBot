@@ -1,0 +1,8 @@
+﻿fastapi
+uvicorn
+pydantic
+sqlalchemy
+thefuzz
+python-levenshtein
+requests
+beautifulsoup4

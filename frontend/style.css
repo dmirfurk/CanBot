@@ -365,3 +365,41 @@ body {
         right: 5%;
     }
 }
+/* --- YAZIYOR/DÜŞÜNÜYOR ANİMASYONU --- */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 10px; /* Yüksekliği sabitleyelim */
+}
+
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background-color: #888; /* Nokta rengi */
+        border-radius: 50%;
+        display: inline-block;
+        animation: typing-bounce 1.4s infinite ease-in-out both;
+        padding: 0; /* Miras kalan padding'i sıfırla */
+        box-shadow: none; /* Miras kalan gölgeyi sıfırla */
+        border: none;
+    }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
