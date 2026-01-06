@@ -6,3 +6,4 @@ thefuzz
 python-levenshtein
 requests
 beautifulsoup4
+scikit-learn

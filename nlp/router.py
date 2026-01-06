@@ -3,6 +3,9 @@ import os
 from nlp.text_utils import extract_keywords, turkish_lower
 from thefuzz import fuzz  # Artık zorunlu, try-except yok.
 
+# RAG (Retrieval-Augmented Generation) fallback
+from rag.rag_engine import answer_with_sources  # Artık zorunlu, try-except yok.
+
 DATA_PATH = "data/site_pages.json"
 FAQ_PATH = "data/faq.json"
 SPECIAL_PATH = "data/special_data.json"
@@ -180,4 +183,5 @@ def route_question(question: str):
             "items": [{"title": best_page["title"], "url": best_page["url"], "snippet": f"Uygunluk: %{min(best_score, 100)}"}]
         }
 
-    return {"answer": "Maalesef bu konuda bir bilgim yok veya ne demek istediğinizi anlayamadım. 😔", "items": []}
+        # 4) RAG fallback (kaynaklardan içerik çekip cevap üret)
+    return answer_with_sources(question)
